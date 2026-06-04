@@ -1,0 +1,98 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ═══ PRODUITS ═══════════════════════════════════════════════════════════════════
+
+model Product {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  subtitle    String   @default("")
+  description String   @default("")
+  price       Float
+  image       String   @default("")
+  category    String   @default("")
+  badge       String   @default("")
+  stock       Int      @default(100)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  orderItems OrderItem[]
+}
+
+// ═══ CLIENTS ════════════════════════════════════════════════════════════════════
+
+model Customer {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  firstName String   @default("")
+  lastName  String   @default("")
+  phone     String   @default("")
+  address   String   @default("")
+  city      String   @default("")
+  zipCode   String   @default("")
+  country   String   @default("FR")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  orders Order[]
+}
+
+// ═══ COMMANDES ══════════════════════════════════════════════════════════════════
+
+model Order {
+  id              String      @id @default(cuid())
+  orderNumber     String      @unique
+  status          OrderStatus @default(PAID)
+  totalAmount     Float
+  shippingAmount  Float       @default(0)
+  stripeSessionId String      @unique
+  stripePaymentId String      @default("")
+
+  shippingName    String @default("")
+  shippingAddress String @default("")
+  shippingCity    String @default("")
+  shippingZip     String @default("")
+  shippingCountry String @default("FR")
+
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id])
+
+  items OrderItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ═══ LIGNES DE COMMANDE ══════════════════════════════════════════════════════════
+
+model OrderItem {
+  id        String @id @default(cuid())
+  quantity  Int
+  unitPrice Float
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id])
+}
+
+// ═══ STATUTS ════════════════════════════════════════════════════════════════════
+
+enum OrderStatus {
+  PENDING
+  PAID
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
