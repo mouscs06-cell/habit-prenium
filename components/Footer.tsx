@@ -1,65 +1,12 @@
 "use client"
 
 import Link from "next/link"
-import { useState } from "react"
+
 import { CONFIG } from "@/CLIENT_CONFIG"
 
 export default function Footer() {
-  const [email, setEmail] = useState("")
-  const [submitted, setSubmitted] = useState(false)
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (email) {
-      setSubmitted(true)
-      setEmail("")
-    }
-  }
-
   return (
     <footer className="bg-[#191716] text-[#f5f2ed]">
-      {/* Newsletter band */}
-      <div className="border-b border-[#f5f2ed]/8">
-        <div className="max-w-[1400px] mx-auto px-6 lg:px-14 py-14 lg:py-20 grid lg:grid-cols-2 gap-10 items-center">
-          <div>
-            <p className="font-jost text-[12px] uppercase tracking-[0.3em] text-[#8a7d6b] mb-4">
-              Newsletter
-            </p>
-            <h3 className="font-cormorant italic text-4xl lg:text-5xl text-[#f5f2ed] leading-tight">
-              Rejoignez l&apos;essentiel
-            </h3>
-          </div>
-          <div>
-            {submitted ? (
-              <p className="font-cormorant italic text-2xl text-[#8a7d6b]">
-                Merci. Bienvenue dans l&apos;essentiel.
-              </p>
-            ) : (
-              <form onSubmit={handleSubmit} className="flex gap-0">
-                <label htmlFor="footer-email" className="sr-only">Adresse email</label>
-                <input
-                  id="footer-email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="votre@email.fr"
-                  required
-                  className="flex-1 bg-transparent border border-[#f5f2ed]/20 px-5 py-4 font-jost text-[13px] text-[#f5f2ed] placeholder-[#7a756e] focus:outline-none focus:border-[#8a7d6b] transition-colors min-h-[52px]"
-                />
-                <button
-                  type="submit"
-                  className="bg-[#8a7d6b] px-7 font-jost text-[12px] uppercase tracking-[0.2em] text-white hover:bg-[#6b5f50] transition-colors min-h-[52px] whitespace-nowrap"
-                >
-                  S&apos;inscrire
-                </button>
-              </form>
-            )}
-            <p className="font-jost text-[11px] text-[#7a756e] mt-3">
-              Discret. Pas de spam. Désabonnement en un clic.
-            </p>
-          </div>
-        </div>
-      </div>
 
       {/* Main footer */}
       <div className="max-w-[1400px] mx-auto px-6 lg:px-14 py-14 lg:py-20 grid grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-16">

@@ -193,6 +193,78 @@ function MagneticImage({ src, aspect }: { src: string; aspect: string }) {
 
 // ─── Animated counter ─────────────────────────────────────────────────────────
 
+// ─── Editorial product card — image pleine avec overlay titre/prix ────────────
+
+function EditorialProductCard({
+  product,
+  aspect = "aspect-[3/4]",
+  sizes = "(max-width: 640px) 50vw, 25vw",
+}: {
+  product: Product
+  aspect?: string
+  sizes?: string
+}) {
+  const { addItem } = useCart()
+  const [hovered, setHovered] = useState(false)
+
+  return (
+    <div data-fade-up>
+      <Link
+        href={`/products/${product.id}`}
+        className="group relative overflow-hidden rounded-2xl block"
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+      >
+        <div className={cn("relative", aspect)}>
+          <Image
+            src={product.image}
+            alt={product.title}
+            fill
+            className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+            sizes={sizes}
+          />
+          {/* Gradient always-visible pour lisibilité */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
+          {/* Badge */}
+          {product.badge && (
+            <span className="absolute top-4 left-4 font-jost text-[11px] uppercase tracking-[0.2em] bg-[#f5f2ed] text-[#191716] px-2.5 py-1 z-20">
+              {product.badge}
+            </span>
+          )}
+          {/* Info en overlay bas */}
+          <div className="absolute bottom-0 left-0 right-0 p-5 z-10">
+            <p className="font-cormorant italic text-lg text-white leading-tight">{product.title}</p>
+            <p className="font-jost text-[13px] text-white/65 mt-0.5">{product.price} €</p>
+          </div>
+          {/* Bouton Ajouter slide-up */}
+          <motion.div
+            className="absolute inset-x-0 bottom-0 bg-[#f5f2ed]/95 flex items-center justify-center py-3 z-20"
+            initial={{ y: "100%" }}
+            animate={{ y: hovered ? 0 : "100%" }}
+            transition={{ duration: 0.22, ease: [0.32, 0.72, 0, 1] }}
+          >
+            <button
+              onClick={(e) => {
+                e.preventDefault()
+                addItem({
+                  id: product.id,
+                  title: product.title,
+                  price: product.price,
+                  image: product.image,
+                  subtitle: product.subtitle,
+                })
+              }}
+              className="font-jost text-[12px] uppercase tracking-[0.2em] text-[#191716] hover:text-[#8a7d6b] transition-colors"
+            >
+              Ajouter au panier
+            </button>
+          </motion.div>
+        </div>
+      </Link>
+    </div>
+  )
+}
+
 // ─── Testimonial card (premium glassmorphism) ─────────────────────────────────
 
 function TestimonialCard({ t }: { t: { name: string; text: string; rating: number } }) {
@@ -461,7 +533,7 @@ export default function HomeClient({ products }: { products: Product[] }) {
       </ScrollExpandMedia>
 
       {/* ══════════════════════════════════════════════════════
-          SECTION 2 — COLLECTION PHARE (#f5f2ed)
+          SECTION 2 — COLLECTION PHARE (#f5f2ed) — Éditorial
       ══════════════════════════════════════════════════════ */}
       <SectionDivider dark={false} />
       <section className="bg-[#f5f2ed] py-20 lg:py-32 overflow-hidden">
@@ -485,65 +557,128 @@ export default function HomeClient({ products }: { products: Product[] }) {
             </Link>
           </div>
 
-          {/* Asymmetric 2-column split */}
-          <div className="grid grid-cols-1 lg:grid-cols-[7fr_5fr] gap-4 lg:gap-5 mb-4 lg:mb-5">
+          {/* Grid éditorial 12 colonnes */}
+          <div className="grid grid-cols-12 gap-3 lg:gap-4">
 
-            {/* Large left image */}
+            {/* Grande image gauche — 7 colonnes */}
             {p[0] && (
-              <Link href={`/products/${p[0].id}`} className="group block">
-                <div className="relative aspect-[3/4] lg:aspect-[4/5] overflow-hidden bg-[#ede9e3] rounded-2xl" data-reveal>
-                  <div data-parallax data-parallax-depth="60" className="absolute inset-0 scale-[1.12]">
-                    <HoverImg src="/habit2.jpg" alt={p[0].title} sizes="(max-width: 1024px) 100vw, 58vw" priority />
+              <Link
+                href={`/products/${p[0].id}`}
+                className="col-span-12 md:col-span-7 group relative overflow-hidden rounded-2xl block"
+                data-reveal
+              >
+                <div className="relative aspect-[3/4]">
+                  <div data-parallax data-parallax-depth="60" className="absolute inset-0 scale-[1.1]">
+                    <Image
+                      src="/habit2.jpg"
+                      alt={p[0].title}
+                      fill
+                      priority
+                      className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+                      sizes="(max-width: 768px) 100vw, 58vw"
+                    />
                   </div>
-                  {p[0].badge && <span className="absolute top-5 left-5 font-jost text-[11px] uppercase tracking-[0.2em] bg-[#f5f2ed] text-[#191716] px-3 py-1.5 z-30">{p[0].badge}</span>}
-                </div>
-                <div className="mt-4 flex justify-between items-baseline">
-                  <div>
-                    <p className="font-jost text-[11px] uppercase tracking-[0.12em] text-[#191716] group-hover:text-[#8a7d6b] transition-colors">{p[0].title}</p>
-                    <p className="font-jost text-[10px] text-[#7a756e] mt-0.5">{p[0].subtitle}</p>
+                  {/* Gradient always */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent" />
+                  {/* Badge */}
+                  {p[0].badge && (
+                    <span className="absolute top-5 left-5 font-jost text-[11px] uppercase tracking-[0.2em] bg-[#f5f2ed] text-[#191716] px-3 py-1.5 z-30">
+                      {p[0].badge}
+                    </span>
+                  )}
+                  {/* Info overlay bottom */}
+                  <div className="absolute bottom-0 left-0 right-0 p-6 z-10">
+                    <p className="font-cormorant italic text-2xl text-white leading-tight mb-1">{p[0].title}</p>
+                    <p className="font-jost text-[13px] text-white/70">{p[0].price} €</p>
                   </div>
-                  <p className="font-cormorant text-2xl text-[#191716]">{p[0].price} €</p>
+                  {/* Hover: "VOIR →" */}
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
+                    <span className="font-jost text-[9px] tracking-[0.4em] uppercase text-white bg-black/30 px-4 py-2 rounded-full backdrop-blur-sm">
+                      VOIR →
+                    </span>
+                  </div>
                 </div>
               </Link>
             )}
 
-            {/* Right column */}
-            <div className="flex flex-col gap-4 lg:gap-5">
+            {/* Colonne droite — 5 colonnes, 2 images */}
+            <div className="col-span-12 md:col-span-5 flex flex-col gap-3 lg:gap-4">
               {p[1] && (
-                <Link href={`/products/${p[1].id}`} className="group block flex-1">
-                  <div className="relative aspect-[4/3] lg:aspect-[4/5] overflow-hidden bg-[#ede9e3] rounded-2xl" data-reveal>
-                    <div data-parallax data-parallax-depth="40" className="absolute inset-0 scale-[1.1]">
-                      <HoverImg src="/habit3.jpg" alt={p[1].title} sizes="(max-width: 1024px) 100vw, 42vw" />
+                <Link
+                  href={`/products/${p[1].id}`}
+                  className="group relative overflow-hidden rounded-2xl flex-1 block"
+                  data-reveal
+                >
+                  <div className="relative aspect-[4/3]">
+                    <Image
+                      src="/habit3.jpg"
+                      alt={p[1].title}
+                      fill
+                      className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+                      sizes="(max-width: 768px) 100vw, 42vw"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                    <div className="absolute bottom-0 left-0 right-0 p-5 z-10">
+                      <p className="font-cormorant italic text-xl text-white">{p[1].title}</p>
+                      <p className="font-jost text-[13px] text-white/70 mt-0.5">{p[1].price} €</p>
                     </div>
-                  </div>
-                  <div className="mt-3 flex justify-between items-baseline">
-                    <p className="font-jost text-[11px] uppercase tracking-[0.12em] text-[#191716] group-hover:text-[#8a7d6b] transition-colors">{p[1].title}</p>
-                    <p className="font-cormorant text-2xl text-[#191716]">{p[1].price} €</p>
                   </div>
                 </Link>
               )}
-              <div className="py-5 border-t border-[#191716]/10" data-fade-up>
-                <p className="font-jost text-[13px] text-[#7a756e] leading-[2] mb-5 max-w-[260px]">
-                  8 pièces. Des matières nobles. Un vestiaire complet.
-                </p>
+              {p[4] && (
                 <Link
-                  href="/catalog"
-                  className="inline-flex items-center gap-3 font-jost text-[12px] uppercase tracking-[0.2em] text-[#8a7d6b] hover:opacity-70 transition-opacity group"
+                  href={`/products/${p[4].id}`}
+                  className="group relative overflow-hidden rounded-2xl flex-1 block"
+                  data-reveal
                 >
-                  Explorer
-                  <span className="w-6 h-px bg-[#8a7d6b] transition-all duration-300 group-hover:w-10" aria-hidden="true" />
+                  <div className="relative aspect-[4/3]">
+                    <Image
+                      src="/habit5.jpg"
+                      alt={p[4].title}
+                      fill
+                      className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+                      sizes="(max-width: 768px) 100vw, 42vw"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                    <div className="absolute bottom-0 left-0 right-0 p-5 z-10">
+                      {p[4].badge && (
+                        <span className="font-jost text-[9px] tracking-[0.3em] uppercase text-white/70 block mb-1">
+                          {p[4].badge}
+                        </span>
+                      )}
+                      <p className="font-cormorant italic text-xl text-white">{p[4].title}</p>
+                      <p className="font-jost text-[13px] text-white/70 mt-0.5">{p[4].price} €</p>
+                    </div>
+                  </div>
                 </Link>
-              </div>
+              )}
             </div>
-          </div>
 
-          {/* Full-width second image */}
-          <div className="relative overflow-hidden rounded-2xl bg-[#ede9e3] group" data-reveal>
-            <div className="aspect-[21/9] relative">
-              <div data-parallax data-parallax-depth="80" className="absolute inset-0 scale-[1.12]">
-                <HoverImg src="/habit4.jpg" alt="Collection AURÈLE" sizes="100vw" />
+            {/* Panoramique pleine largeur */}
+            <Link
+              href="/catalog"
+              className="col-span-12 group relative overflow-hidden rounded-2xl block"
+              data-reveal
+            >
+              <div className="relative aspect-[21/8]">
+                <div data-parallax data-parallax-depth="80" className="absolute inset-0 scale-[1.1]">
+                  <Image
+                    src="/habit4.jpg"
+                    alt="Découvrir la collection AURÈLE"
+                    fill
+                    className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.02]"
+                    sizes="100vw"
+                  />
+                </div>
+                <div className="absolute inset-0 bg-black/15 group-hover:bg-black/28 transition-colors duration-400" />
+                <div className="absolute bottom-8 left-8 flex items-center gap-4">
+                  <p className="font-jost text-[10px] tracking-[0.4em] uppercase text-white/80 group-hover:text-white transition-colors duration-300">
+                    EXPLORER LA COLLECTION
+                  </p>
+                  <span className="w-8 h-px bg-white/50 group-hover:w-14 transition-all duration-400" aria-hidden="true" />
+                </div>
               </div>
-            </div>
+            </Link>
           </div>
         </div>
       </section>
@@ -624,27 +759,57 @@ export default function HomeClient({ products }: { products: Product[] }) {
             </p>
           </div>
 
-          {/* Row 1: 50 / 50 */}
-          <div className="grid grid-cols-2 gap-3 lg:gap-4 mb-3 lg:mb-4">
-            {p[0] && <ProductCard product={p[0]} index={0} />}
-            {p[1] && <ProductCard product={p[1]} index={1} />}
-          </div>
+          {/* Grid 12 colonnes asymétrique */}
+          <div className="grid grid-cols-12 gap-3 lg:gap-4">
 
-          {/* Row 2: 33 / 33 / 33 */}
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-4 mb-3 lg:mb-4">
-            {p[2] && <ProductCard product={p[2]} index={2} />}
-            {p[3] && <ProductCard product={p[3]} index={3} />}
-            {p[4] && <ProductCard product={p[4]} index={4} />}
-          </div>
+            {/* Rangée 1 : 6 + 6 */}
+            {p[0] && (
+              <div className="col-span-6">
+                <EditorialProductCard product={p[0]} aspect="aspect-[3/4]" sizes="(max-width: 640px) 50vw, 50vw" />
+              </div>
+            )}
+            {p[1] && (
+              <div className="col-span-6">
+                <EditorialProductCard product={p[1]} aspect="aspect-[3/4]" sizes="(max-width: 640px) 50vw, 50vw" />
+              </div>
+            )}
 
-          {/* Row 3: 60 / 40 */}
-          <div className="grid grid-cols-2 lg:grid-cols-[3fr_2fr] gap-3 lg:gap-4 mb-3 lg:mb-4">
-            {p[5] && <ProductCard product={p[5]} index={5} />}
-            {p[6] && <ProductCard product={p[6]} index={6} />}
-          </div>
+            {/* Rangée 2 : 4 + 4 + 4 */}
+            {p[2] && (
+              <div className="col-span-4">
+                <EditorialProductCard product={p[2]} aspect="aspect-[3/4]" sizes="(max-width: 640px) 50vw, 33vw" />
+              </div>
+            )}
+            {p[3] && (
+              <div className="col-span-4">
+                <EditorialProductCard product={p[3]} aspect="aspect-[3/4]" sizes="(max-width: 640px) 50vw, 33vw" />
+              </div>
+            )}
+            {p[4] && (
+              <div className="col-span-4">
+                <EditorialProductCard product={p[4]} aspect="aspect-[3/4]" sizes="(max-width: 640px) 50vw, 33vw" />
+              </div>
+            )}
 
-          {/* Row 4: panoramic */}
-          {p[7] && <ProductCard product={p[7]} panoramic index={7} />}
+            {/* Rangée 3 : 7 (paysage) + 5 (portrait) */}
+            {p[5] && (
+              <div className="col-span-12 lg:col-span-7">
+                <EditorialProductCard product={p[5]} aspect="aspect-[4/3] lg:aspect-[4/3]" sizes="(max-width: 1024px) 100vw, 58vw" />
+              </div>
+            )}
+            {p[6] && (
+              <div className="col-span-12 lg:col-span-5">
+                <EditorialProductCard product={p[6]} aspect="aspect-[3/4]" sizes="(max-width: 1024px) 100vw, 42vw" />
+              </div>
+            )}
+
+            {/* Rangée 4 : panoramique pleine largeur */}
+            {p[7] && (
+              <div className="col-span-12">
+                <EditorialProductCard product={p[7]} aspect="aspect-[21/8]" sizes="100vw" />
+              </div>
+            )}
+          </div>
 
           <div className="text-center mt-12 lg:mt-16" data-fade-up>
             <FillButton href="/catalog">Voir toutes les collections</FillButton>
