@@ -193,6 +193,54 @@ function MagneticImage({ src, aspect }: { src: string; aspect: string }) {
 
 // ─── Animated counter ─────────────────────────────────────────────────────────
 
+// ─── Testimonial card (premium glassmorphism) ─────────────────────────────────
+
+function TestimonialCard({ t }: { t: { name: string; text: string; rating: number } }) {
+  return (
+    <div className="group flex-shrink-0 w-[380px] relative overflow-hidden rounded-2xl p-8 bg-white/60 backdrop-blur-sm border border-[#191716]/[0.04] hover:bg-white hover:shadow-[0_20px_50px_rgba(0,0,0,0.06)] hover:border-[#8a7d6b]/20 cursor-default [transition:background-color_0.35s,border-color_0.35s,box-shadow_0.35s]">
+      {/* Top gradient line */}
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#8a7d6b]/30 to-transparent group-hover:via-[#8a7d6b]/60 transition-all duration-500" />
+
+      {/* Guillemet décoratif */}
+      <span
+        className="block font-cormorant text-7xl text-[#8a7d6b]/10 leading-none mb-3 select-none group-hover:text-[#8a7d6b]/25 group-hover:translate-x-1 transition-all duration-300"
+        aria-hidden="true"
+      >
+        &ldquo;
+      </span>
+
+      {/* Étoiles animées */}
+      <div className="flex gap-1.5 mb-5" aria-label={`${t.rating} étoiles`}>
+        {[0, 1, 2, 3, 4].map((j) => (
+          <span
+            key={j}
+            className="text-[#8a7d6b] text-sm inline-block transition-all duration-200 group-hover:scale-125 group-hover:rotate-12"
+            style={{ transitionDelay: `${j * 40}ms` }}
+            aria-hidden="true"
+          >
+            ★
+          </span>
+        ))}
+      </div>
+
+      {/* Citation */}
+      <p className="font-cormorant italic text-[18px] text-[#191716] leading-[1.65] mb-6">
+        &ldquo;{t.text}&rdquo;
+      </p>
+
+      {/* Séparateur animé */}
+      <div className="h-px w-8 bg-[#8a7d6b]/20 mb-4 group-hover:w-16 transition-all duration-500" />
+
+      {/* Nom */}
+      <p className="font-jost text-[12px] tracking-[0.3em] uppercase text-[#7a756e] group-hover:text-[#8a7d6b] group-hover:tracking-[0.35em] transition-all duration-300">
+        {t.name}
+      </p>
+    </div>
+  )
+}
+
+// ─── Animated counter ─────────────────────────────────────────────────────────
+
 function AnimatedCounter({ end, suffix = "" }: { end: number; suffix?: string }) {
   const ref = useRef<HTMLSpanElement>(null)
   const triggered = useRef(false)
@@ -372,18 +420,7 @@ export default function HomeClient({ products }: { products: Product[] }) {
           })
         })
 
-        // ── Testimonial cards — stagger avec légère rotation ──
-        const testimonialCards = gsap.utils.toArray<Element>("[data-testimonial]")
-        if (testimonialCards.length) {
-          gsap.from(testimonialCards, {
-            y: 40, opacity: 0, rotate: 2,
-            stagger: 0.06, duration: 0.5, ease: "power3.out",
-            scrollTrigger: {
-              trigger: testimonialCards[0].closest("section") ?? testimonialCards[0],
-              start: "top 90%",
-            },
-          })
-        }
+        // Testimonials handled by Framer Motion whileInView (no GSAP needed)
       })
       return () => mm.revert()
     },
@@ -743,57 +780,63 @@ export default function HomeClient({ products }: { products: Product[] }) {
       </section>
 
       {/* ══════════════════════════════════════════════════════
-          SECTION 8 — TÉMOIGNAGES (#f5f2ed)
+          SECTION 8 — TÉMOIGNAGES (#f5f2ed) — Carrousel infini
       ══════════════════════════════════════════════════════ */}
       <SectionDivider dark={false} />
-      <section className="bg-[#f5f2ed] py-20 lg:py-28">
-        <div className="max-w-[1400px] mx-auto px-6 lg:px-14">
-          <div className="mb-10 lg:mb-12" data-fade-up>
-            <SectionLabel text="CE QU'ILS EN DISENT" />
-            <div data-word-section>
-              <WordReveal
-                text="Ils portent AURÈLE"
-                as="h2"
-                className="font-cormorant italic text-4xl lg:text-5xl text-[#191716]"
-              />
-            </div>
+      <section className="bg-[#f5f2ed] py-20 lg:py-28 overflow-hidden">
+        {/* Header */}
+        <div className="max-w-[1400px] mx-auto px-6 lg:px-14 mb-12 lg:mb-16" data-fade-up>
+          <SectionLabel text="CE QU'ILS EN DISENT" />
+          <div data-word-section>
+            <WordReveal
+              text="Ils portent AURÈLE"
+              as="h2"
+              className="font-cormorant italic text-4xl lg:text-5xl text-[#191716]"
+            />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {CONFIG.testimonials.map((t) => (
-              <div
-                key={t.name}
-                data-testimonial
-                className="group relative transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)] hover:bg-white hover:border-[#8a7d6b]/20 border border-transparent rounded-2xl p-8 bg-[#f5f2ed]/50 cursor-default"
-              >
-                {/* Guillemet décoratif */}
-                <span
-                  className="absolute top-4 left-6 font-cormorant text-6xl text-[#8a7d6b]/10 leading-none select-none group-hover:text-[#8a7d6b]/20 transition-colors duration-300"
-                  aria-hidden="true"
-                >
-                  &ldquo;
-                </span>
+        </div>
 
-                {/* Étoiles animées */}
-                <div className="flex gap-1 mb-5" aria-label={`${t.rating} étoiles`}>
-                  {Array.from({ length: t.rating }).map((_, si) => (
-                    <span
-                      key={si}
-                      className="inline-block transition-transform duration-200 group-hover:scale-[1.15] text-[#8a7d6b] text-[11px]"
-                      style={{ transitionDelay: `${si * 30}ms` }}
-                      aria-hidden="true"
-                    >
-                      ★
-                    </span>
-                  ))}
-                </div>
-
-                <p className="font-cormorant italic text-lg text-[#191716] leading-[1.7] mb-5 relative z-10">
-                  &ldquo;{t.text}&rdquo;
-                </p>
-                <p className="font-jost text-[11px] uppercase tracking-[0.25em] text-[#8a7d6b]">{t.name}</p>
-              </div>
+        {/* Rangée 1 — gauche */}
+        <motion.div
+          className="overflow-hidden py-3"
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <div className="animate-scroll-left flex gap-5">
+            {[
+              ...CONFIG.testimonials.slice(0, 3),
+              ...CONFIG.testimonials.slice(0, 3),
+            ].map((t, i) => (
+              <TestimonialCard key={`r1-${i}`} t={t} />
             ))}
           </div>
+        </motion.div>
+
+        {/* Rangée 2 — droite */}
+        <motion.div
+          className="overflow-hidden py-3"
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.6, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <div className="animate-scroll-right flex gap-5">
+            {[
+              ...CONFIG.testimonials.slice(3, 6),
+              ...CONFIG.testimonials.slice(3, 6),
+            ].map((t, i) => (
+              <TestimonialCard key={`r2-${i}`} t={t} />
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Indicateur — petits points */}
+        <div className="flex justify-center gap-2 mt-10">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="w-1.5 h-1.5 rounded-full bg-[#8a7d6b]/25" />
+          ))}
         </div>
       </section>
 
